@@ -1,4 +1,5 @@
 import ProtectedRoute from "@/pages/auth/ProtectedRouter";
+import UserDashboard from "@/pages/user/UserDashboard";
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
@@ -26,9 +27,7 @@ const CategoryPage = lazy(
 // Public pages
 const ProductListPage = lazy(() => import("../pages/public/ProductList"));
 const ProductDetailPage = lazy(() => import("../pages/public/ProductDetail"));
-
-// User pages
-const UserDashboard = lazy(() => import("../pages/user/UserDashboard"));
+const CartPage = lazy(() => import("../pages/cart/CartPage"));
 
 const router = createBrowserRouter([
   // Public Routes - Không cần đăng nhập
@@ -80,6 +79,14 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "cart",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <CartPage />
+          </Suspense>
+        ),
+      },
     ],
   },
 
@@ -119,7 +126,6 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
-          // Thêm các route admin khác ở đây
         ],
       },
     ],
@@ -145,13 +151,10 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
-          // Thêm các route user khác ở đây
         ],
       },
     ],
   },
-
-  // Fallback route
   {
     path: "*",
     element: (

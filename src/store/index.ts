@@ -3,10 +3,12 @@ import { persistStore, persistReducer } from 'redux-persist';
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import persistConfig from './persistConfig';
 import authReducer from './authSlice';
+import cartReducer from './cartSlice';
 
 // Combine các reducers
 const rootReducer = combineReducers({
   auth: authReducer,
+  cart: cartReducer,
   // Thêm các reducer khác ở đây
 });
 

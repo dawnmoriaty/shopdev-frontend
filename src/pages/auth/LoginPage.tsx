@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth"; // Cập nhật import path
+import { useAuth } from "@/hooks/useAuth";
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -10,21 +10,15 @@ const LoginPage: React.FC = () => {
     password?: string;
   }>({});
 
-  const { login, user, loading, error, isAdmin, isUser } = useAuth();
+  const { login, loading, error, isAuthenticated, isAdmin, isUser } = useAuth();
   const navigate = useNavigate();
 
-  // Nếu đã đăng nhập, redirect đến trang phù hợp
+  // Kiểm tra nếu đã đăng nhập thì chuyển hướng
   useEffect(() => {
-    if (user) {
-      if (isAdmin()) {
-        navigate("/admin");
-      } else if (isUser()) {
-        navigate("/user");
-      } else {
-        navigate("/");
-      }
+    if (isAuthenticated()) {
+      handleRedirectAfterLogin();
     }
-  }, [user, isAdmin, isUser, navigate]);
+  }, []);
 
   const validateForm = () => {
     const formErrors: { username?: string; password?: string } = {};
@@ -51,8 +45,29 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    await login({ username, password });
-    // Việc redirect sẽ được xử lý bởi useEffect
+    try {
+      await login({ username, password });
+      handleRedirectAfterLogin();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      // Lỗi đã được xử lý trong authSlice
+    }
+  };
+
+  // Xử lý chuyển hướng sau khi đăng nhập thành công
+  const handleRedirectAfterLogin = () => {
+    const redirectPath = sessionStorage.getItem("redirectAfterLogin");
+
+    if (redirectPath) {
+      sessionStorage.removeItem("redirectAfterLogin");
+      navigate(redirectPath);
+    } else if (isAdmin()) {
+      navigate("/admin");
+    } else if (isUser()) {
+      navigate("/user");
+    } else {
+      navigate("/");
+    }
   };
 
   return (
@@ -68,7 +83,7 @@ const LoginPage: React.FC = () => {
               to="/register"
               className="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              tạo tài khoản mới
+              đăng ký tài khoản mới
             </Link>
           </p>
         </div>
@@ -81,7 +96,7 @@ const LoginPage: React.FC = () => {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
-            <div>
+            <div className="mb-4">
               <label htmlFor="username" className="sr-only">
                 Tên đăng nhập
               </label>
@@ -96,9 +111,10 @@ const LoginPage: React.FC = () => {
                 placeholder="Tên đăng nhập"
               />
               {errors.username && (
-                <p className="mt-1 text-sm text-red-600">{errors.username}</p>
+                <p className="text-red-500 text-xs mt-1">{errors.username}</p>
               )}
             </div>
+
             <div>
               <label htmlFor="password" className="sr-only">
                 Mật khẩu
@@ -114,7 +130,7 @@ const LoginPage: React.FC = () => {
                 placeholder="Mật khẩu"
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
               )}
             </div>
           </div>
