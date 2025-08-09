@@ -1,4 +1,4 @@
-import type { CartItem, CartItemRequest, QuantityRequest } from "@/types/cart";
+import type { CartItem, CartItemRequest } from "@/types/cart";
 import api from "./api";
 import type { ApiResponse } from "@/types";
 
@@ -18,7 +18,7 @@ export const cartService = {
   },
 
   // Cập nhật số lượng sản phẩm
-  updateCartItem: async (cartItemId: number, request: QuantityRequest): Promise<CartItem> => {
+  updateCartItem: async (cartItemId: number, request: { quantity: number }): Promise<CartItem> => {
     const response = await api.put<ApiResponse<CartItem>>(`${CART_URL}/${cartItemId}`, request);
     return response.data.data;
   },
@@ -34,7 +34,7 @@ export const cartService = {
   },
 
   // Thanh toán giỏ hàng
-  checkout: async (): Promise<void> => {
-    await api.post<ApiResponse<void>>(`${CART_URL}/checkout`);
+  checkout: async (payload: { addressId: number; paymentMethod: 'COD' | 'VNPAY' | 'MOMO'; note?: string }): Promise<void> => {
+    await api.post<ApiResponse<void>>(`${CART_URL}/checkout`, payload);
   }
 };

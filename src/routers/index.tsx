@@ -3,7 +3,6 @@ import UserDashboard from "@/pages/user/UserDashboard";
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
-
 // Lazy loading các component
 const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/auth/RegisterPage"));
@@ -23,11 +22,25 @@ const AdminProductsPage = lazy(
 const CategoryPage = lazy(
   () => import("../pages/admin/categories/CategoryPage")
 );
+const AdminOrdersPage = lazy(
+  () => import("../pages/admin/orders/AdminOrdersPage")
+);
+const AdminOrderDetailPage = lazy(
+  () => import("../pages/admin/orders/AdminOrderDetailPage")
+);
 
 // Public pages
 const ProductListPage = lazy(() => import("../pages/public/ProductList"));
 const ProductDetailPage = lazy(() => import("../pages/public/ProductDetail"));
 const CartPage = lazy(() => import("../pages/cart/CartPage"));
+const AddressesPage = lazy(() => import("../pages/account/AddressesPage"));
+const UserOrdersPage = lazy(
+  () => import("../pages/user/orders/UserOrdersPage")
+);
+const UserOrderDetailPage = lazy(
+  () => import("../pages/user/orders/UserOrderDetailPage")
+);
+const CheckoutPage = lazy(() => import("../pages/checkout/CheckoutPage"));
 
 const router = createBrowserRouter([
   // Public Routes - Không cần đăng nhập
@@ -126,6 +139,22 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
+          {
+            path: "orders",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <AdminOrdersPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "orders/:id",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <AdminOrderDetailPage />
+              </Suspense>
+            ),
+          },
         ],
       },
     ],
@@ -148,6 +177,38 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<div>Loading...</div>}>
                 <UserDashboard />
+              </Suspense>
+            ),
+          },
+          {
+            path: "addresses",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <AddressesPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "orders",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <UserOrdersPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "orders/:serial",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <UserOrderDetailPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "checkout",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <CheckoutPage />
               </Suspense>
             ),
           },

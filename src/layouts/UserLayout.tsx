@@ -1,4 +1,4 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import { Outlet, Link, useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 const UserLayout = () => {
@@ -63,6 +63,20 @@ const UserLayout = () => {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <NavLink
+                    to="/user/addresses"
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded text-sm ${
+                        isActive
+                          ? "bg-blue-600 text-white"
+                          : "hover:bg-gray-100"
+                      }`
+                    }
+                  >
+                    Địa chỉ
+                  </NavLink>
+                </li>
               </ul>
             </nav>
           </div>

@@ -4,12 +4,15 @@ import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist
 import persistConfig from './persistConfig';
 import authReducer from './authSlice';
 import cartReducer from './cartSlice';
+import addressReducer from './addressSlice';
+import orderReducer from './orderSlice';
 
 // Combine các reducers
 const rootReducer = combineReducers({
   auth: authReducer,
   cart: cartReducer,
-  // Thêm các reducer khác ở đây
+  addresses: addressReducer,
+  orders: orderReducer
 });
 
 // Áp dụng persistReducer vào rootReducer
@@ -20,15 +23,11 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+      serializableCheck: { ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER] }
+    })
 });
 
-// Tạo persistor
 export const persistor = persistStore(store);
 
-// Export types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

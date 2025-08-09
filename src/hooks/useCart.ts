@@ -30,18 +30,16 @@ export const useCart = () => {
   // Lấy giỏ hàng - chỉ fetch nếu cần thiết
   const getCart = useCallback(() => {
     const now = Date.now();
-    
-    // Nếu đang fetch hoặc mới fetch gần đây, không fetch lại
     if (fetchingRef.current || (now - lastFetchTimeRef.current < MIN_FETCH_INTERVAL)) {
       return Promise.resolve(items);
     }
-    
     fetchingRef.current = true;
     return dispatch(fetchCart())
-      .then((result) => {
+      .then(result => {
         lastFetchTimeRef.current = Date.now();
         return result.payload;
       })
+      .catch(() => [])
       .finally(() => {
         fetchingRef.current = false;
       });

@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { productService } from "@/services/productService";
 import ProductCard from "@/components/product/ProductCard";
 import type { Product } from "@/types/product";
 import { categoryService } from "@/services/categoryService";
 import type { Category } from "@/types/category";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const ProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,6 +13,8 @@ const ProductList: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
 
   // Fetch tất cả sản phẩm và danh mục khi component mount
   useEffect(() => {
@@ -40,36 +44,35 @@ const ProductList: React.FC = () => {
 
   // Fetch sản phẩm theo danh mục khi selectedCategory thay đổi
   useEffect(() => {
-    const fetchProductsByCategory = async () => {
-      if (selectedCategory === null) return;
-
+    const fetchProducts = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        if (selectedCategory === 0) {
-          // Nếu chọn "Tất cả", lấy tất cả sản phẩm
-          const productsData = await productService.getAllProducts();
-          setProducts(productsData);
+        let data: Product[] = [];
+        if (selectedCategory && selectedCategory !== 0) {
+          data = await productService.getProductsByCategoryId(selectedCategory);
         } else {
-          // Lấy sản phẩm theo danh mục
-          const productsData = await productService.getProductsByCategoryId(
-            selectedCategory
-          );
-          setProducts(productsData);
+          data = await productService.getAllProducts();
         }
+
+        // Filter client-side (tạm)
+        const filtered = debouncedSearch.trim()
+          ? data.filter((p) =>
+              p.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+            )
+          : data;
+
+        setProducts(filtered);
       } catch (err) {
-        console.error("Error fetching products by category:", err);
-        setError("Không thể tải sản phẩm theo danh mục. Vui lòng thử lại sau.");
+        setError("Không thể tải sản phẩm. Vui lòng thử lại.");
       } finally {
         setLoading(false);
       }
     };
 
-    if (selectedCategory !== null) {
-      fetchProductsByCategory();
-    }
-  }, [selectedCategory]);
+    fetchProducts();
+  }, [selectedCategory, debouncedSearch]);
 
   const handleCategoryChange = (categoryId: number) => {
     setSelectedCategory(categoryId);
@@ -107,6 +110,19 @@ const ProductList: React.FC = () => {
               {category.name}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Tìm kiếm sản phẩm */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Tìm sản phẩm..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+          />
         </div>
       </div>
 

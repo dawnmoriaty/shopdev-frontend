@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const UserDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -34,6 +35,15 @@ const UserDashboard: React.FC = () => {
           <h2 className="text-lg font-semibold mb-4">Sản phẩm yêu thích</h2>
           <p className="text-gray-500">Bạn chưa có sản phẩm yêu thích nào.</p>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <Link
+          to="/user/addresses"
+          className="inline-block bg-blue-600 text-white px-4 py-2 rounded text-sm"
+        >
+          Quản lý địa chỉ
+        </Link>
       </div>
     </div>
   );

@@ -8,12 +8,15 @@ const Header = () => {
   const { getTotalItems, getCart } = useCart();
   const navigate = useNavigate();
 
+  const authenticated = isAuthenticated();
+
   // Lấy giỏ hàng khi component mount
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (authenticated) {
       getCart();
     }
-  }, [isAuthenticated]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated]); // Tránh đưa isAuthenticated (function) vào deps
 
   const handleLogout = async () => {
     await logout();

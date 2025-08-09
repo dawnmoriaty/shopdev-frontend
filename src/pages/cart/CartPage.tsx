@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
 import CartItem from "@/components/cart/CartItem";
 import CartSummary from "@/components/cart/CartSummary";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const CartPage: React.FC = () => {
   const { items, loading, error, getCart, emptyCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getCart();
@@ -54,6 +55,11 @@ const CartPage: React.FC = () => {
     );
   }
 
+  const subtotal = items.reduce(
+    (sum, it) => sum + (it.productPrice || 0) * it.quantity,
+    0
+  );
+
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-6">
@@ -77,6 +83,23 @@ const CartPage: React.FC = () => {
           <CartSummary />
         </div>
       </div>
+
+      <div className="mt-6 border-t pt-4 flex justify-between">
+        <div className="font-medium">Tạm tính:</div>
+        <div>
+          {subtotal.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          })}
+        </div>
+      </div>
+      <button
+        onClick={() => navigate("/user/checkout")}
+        disabled={!items.length}
+        className="mt-4 w-full bg-indigo-600 text-white py-2 rounded disabled:opacity-50"
+      >
+        Tới trang thanh toán
+      </button>
     </div>
   );
 };
