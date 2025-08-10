@@ -1,21 +1,33 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import CartItem from "@/components/cart/CartItem";
 import CartSummary from "@/components/cart/CartSummary";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const CartPage: React.FC = () => {
-  const { items, loading, error, getCart, emptyCart } = useCart();
   const navigate = useNavigate();
+  const { items, loading, error, getCart, emptyCart } = useCart();
+
+  console.log("🛒 CartPage state:", {
+    items,
+    itemsLength: items?.length,
+    loading,
+    error,
+  });
 
   useEffect(() => {
     getCart();
-  }, []);
+  }, [getCart]);
 
   const handleClearCart = () => {
     if (window.confirm("Bạn có chắc muốn xóa toàn bộ giỏ hàng?")) {
       emptyCart();
     }
+  };
+
+  const handleCheckout = () => {
+    navigate("/checkout");
   };
 
   if (loading && items.length === 0) {
@@ -55,11 +67,6 @@ const CartPage: React.FC = () => {
     );
   }
 
-  const subtotal = items.reduce(
-    (sum, it) => sum + (it.productPrice || 0) * it.quantity,
-    0
-  );
-
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-6">
@@ -72,34 +79,22 @@ const CartPage: React.FC = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
           {items.map((item) => (
             <CartItem key={item.id} item={item} />
           ))}
         </div>
 
-        <div className="md:col-span-1">
-          <CartSummary />
+        <div className="lg:col-span-1">
+          <CartSummary
+            items={items}
+            onCheckout={handleCheckout}
+            isLoading={loading}
+            showCheckoutButton={true}
+          />
         </div>
       </div>
-
-      <div className="mt-6 border-t pt-4 flex justify-between">
-        <div className="font-medium">Tạm tính:</div>
-        <div>
-          {subtotal.toLocaleString("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          })}
-        </div>
-      </div>
-      <button
-        onClick={() => navigate("/user/checkout")}
-        disabled={!items.length}
-        className="mt-4 w-full bg-indigo-600 text-white py-2 rounded disabled:opacity-50"
-      >
-        Tới trang thanh toán
-      </button>
     </div>
   );
 };

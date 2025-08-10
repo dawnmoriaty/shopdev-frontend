@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useMemo } from 'react';
 import type { AppDispatch } from '@/store';
 import { 
   fetchCart, 
@@ -12,13 +12,16 @@ import {
   selectCartLoading,
   selectCartError,
 } from '@/store/cartSlice';
+import { useAuth } from './useAuth';
 import type { CartItemRequest, QuantityRequest } from '@/types/cart';
 
 export const useCart = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const items = useSelector(selectCartItems);
+  const rawItems = useSelector(selectCartItems);
+  const items = useMemo(() => rawItems || [], [rawItems]);
   const loading = useSelector(selectCartLoading);
   const error = useSelector(selectCartError);
+  const { isAdmin } = useAuth();
   
   // Sử dụng ref để theo dõi trạng thái fetch
   const fetchingRef = useRef(false);
@@ -29,6 +32,9 @@ export const useCart = () => {
 
   // Lấy giỏ hàng - chỉ fetch nếu cần thiết
   const getCart = useCallback(() => {
+    if (isAdmin()) { // Admin không dùng giỏ hàng user
+      return Promise.resolve([]);
+    }
     const now = Date.now();
     if (fetchingRef.current || (now - lastFetchTimeRef.current < MIN_FETCH_INTERVAL)) {
       return Promise.resolve(items);
@@ -43,7 +49,7 @@ export const useCart = () => {
       .finally(() => {
         fetchingRef.current = false;
       });
-  }, [dispatch, items]);
+  }, [dispatch, items, isAdmin]);
 
   // Thêm sản phẩm vào giỏ hàng - thêm debounce
   const addItemToCart = useCallback((productId: number, quantity: number = 1) => {
@@ -51,14 +57,16 @@ export const useCart = () => {
       productId,
       quantity
     };
+    if (isAdmin()) return Promise.resolve();
     return dispatch(addToCart(cartItem));
-  }, [dispatch]);
+  }, [dispatch, isAdmin]);
 
   // Cập nhật số lượng sản phẩm - thêm debounce
   const updateItem = useCallback((cartItemId: number, quantity: number) => {
     const request: QuantityRequest = { quantity };
+    if (isAdmin()) return Promise.resolve();
     return dispatch(updateCartItem({ cartItemId, request }));
-  }, [dispatch]);
+  }, [dispatch, isAdmin]);
 
   return {
     items,
@@ -71,6 +79,9 @@ export const useCart = () => {
     updateItem,
     removeItem: useCallback((cartItemId: number) => dispatch(deleteCartItem(cartItemId)), [dispatch]),
     emptyCart: useCallback(() => dispatch(clearCart()), [dispatch]),
-    checkoutCart: useCallback(() => dispatch(checkout()), [dispatch])
+    checkoutCart: useCallback((payload: { addressId: number; paymentMethod: 'COD' | 'VNPAY' | 'MOMO'; note?: string }) => {
+      if (isAdmin()) return Promise.resolve();
+      return dispatch(checkout(payload));
+    }, [dispatch, isAdmin])
   };
 };

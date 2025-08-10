@@ -1,6 +1,7 @@
 import type { CartItem, CartItemRequest } from "@/types/cart";
 import api from "./api";
 import type { ApiResponse } from "@/types";
+import type { Order } from "@/types/order";
 
 const CART_URL = '/cart';
 
@@ -33,8 +34,9 @@ export const cartService = {
     await api.delete<ApiResponse<void>>(`${CART_URL}/clear`);
   },
 
-  // Thanh toán giỏ hàng
-  checkout: async (payload: { addressId: number; paymentMethod: 'COD' | 'VNPAY' | 'MOMO'; note?: string }): Promise<void> => {
-    await api.post<ApiResponse<void>>(`${CART_URL}/checkout`, payload);
+  // Thanh toán giỏ hàng: trả về Order để có thể hiển thị hoặc redirect chi tiết
+  checkout: async (payload: { addressId: number; paymentMethod: 'COD' | 'VNPAY' | 'MOMO'; note?: string }): Promise<Order> => {
+    const res = await api.post<ApiResponse<Order>>(`${CART_URL}/checkout`, payload);
+    return res.data.data;
   }
 };

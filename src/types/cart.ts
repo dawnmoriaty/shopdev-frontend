@@ -15,3 +15,16 @@ export interface CartItemRequest {
 export interface QuantityRequest {
   quantity: number;
 }
+
+export interface CartSummary {
+  items: CartItem[];
+  totalItems: number;
+  totalPrice: number;
+  isEmpty: boolean;
+}
+
+export interface CreateOrderRequest {
+  addressId: number;
+  paymentMethod: 'COD' | 'VNPAY' | 'MOMO';
+  note?: string;
+}

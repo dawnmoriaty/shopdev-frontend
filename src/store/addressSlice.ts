@@ -65,4 +65,9 @@ const addressSlice = createSlice({
   }
 });
 
+// Selectors
+export const selectAddresses = (state: { addresses: AddressState }) => state.addresses.items;
+export const selectAddressLoading = (state: { addresses: AddressState }) => state.addresses.loading;
+export const selectAddressError = (state: { addresses: AddressState }) => state.addresses.error;
+
 export default addressSlice.reducer;

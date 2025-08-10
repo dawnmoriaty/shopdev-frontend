@@ -8,8 +8,9 @@ import {
   isRejected
 } from '@reduxjs/toolkit';
 import { cartService } from '../services/cartService';
+import type { Order } from '@/types/order';
 import type { CartItem, CartItemRequest, QuantityRequest } from '@/types/cart';
-import type { RootState } from '../store'; // Giả sử bạn có file store.ts định nghĩa RootState
+import type { RootState } from '../store'; 
 
 // Định nghĩa một kiểu cho lỗi từ API để tăng type safety
 interface ApiError {
@@ -100,14 +101,17 @@ export const clearCart = createAsyncThunk('cart/clearCart', async (_, { rejectWi
 });
 
 // checkout thunk không thay đổi
-export const checkout = createAsyncThunk('cart/checkout', async (_, { rejectWithValue }) => {
-  try {
-    await cartService.checkout();
-    return null;
-  } catch (error: unknown) {
-    return rejectWithValue(getErrorMessage(error));
+export const checkout = createAsyncThunk(
+  'cart/checkout',
+  async (payload: { addressId: number; paymentMethod: 'COD' | 'VNPAY' | 'MOMO'; note?: string }, { rejectWithValue }) => {
+    try {
+      const order: Order = await cartService.checkout(payload);
+      return order;
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error));
+    }
   }
-});
+);
 
 
 const cartSlice = createSlice({
@@ -156,7 +160,7 @@ const cartSlice = createSlice({
       })
       .addCase(checkout.fulfilled, (state) => {
         state.loading = 'succeeded';
-        state.items = []; // Giỏ hàng trống sau khi thanh toán
+        state.items = []; // Clear cart sau khi checkout thành công
       })
 
       // Dùng addMatcher để xử lý các trường hợp chung

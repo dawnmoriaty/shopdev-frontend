@@ -41,6 +41,7 @@ const UserOrderDetailPage = lazy(
   () => import("../pages/user/orders/UserOrderDetailPage")
 );
 const CheckoutPage = lazy(() => import("../pages/checkout/CheckoutPage"));
+const OrderSuccessPage = lazy(() => import("../pages/order/OrderSuccessPage"));
 
 const router = createBrowserRouter([
   // Public Routes - Không cần đăng nhập
@@ -97,6 +98,30 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <CartPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "checkout",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <CheckoutPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "order-success",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <OrderSuccessPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "order-success/:orderId",
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <OrderSuccessPage />
           </Suspense>
         ),
       },
@@ -201,14 +226,6 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<div>Loading...</div>}>
                 <UserOrderDetailPage />
-              </Suspense>
-            ),
-          },
-          {
-            path: "checkout",
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <CheckoutPage />
               </Suspense>
             ),
           },

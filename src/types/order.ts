@@ -5,6 +5,7 @@ export interface OrderItem {
   id: number;
   productId: number;
   productName: string;
+  productPrice: number;
   unitPrice: string;
   quantity: number;
   lineTotal: string;
@@ -12,11 +13,12 @@ export interface OrderItem {
 
 export interface Order {
   id: number;
+  serial?: string;
   serialNumber: string;
   userId: number;
   status: OrderStatus;
   paymentMethod: PaymentMethod;
-  totalAmount: string;
+  totalAmount: number;
   shippingName: string;
   shippingPhone: string;
   shippingAddress: string;
@@ -24,4 +26,5 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
+  orderItems?: OrderItem[];
 }
